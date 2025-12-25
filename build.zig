@@ -24,9 +24,11 @@ pub fn build(b: *std.Build) !void {
     // Creates a step for unit testing. This only builds the test executable
     // but does not run it.
     const lib_unit_tests = b.addTest(.{
-        .root_source_file = b.path("src/root.zig"),
-        .target = target,
-        .optimize = optimize,
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("src/root.zig"),
+            .target = target,
+            .optimize = optimize,
+        }),
     });
 
     const run_lib_unit_tests = b.addRunArtifact(lib_unit_tests);
@@ -65,9 +67,11 @@ pub fn build(b: *std.Build) !void {
 
         var exe = b.addExecutable(.{
             .name = example.name,
-            .root_source_file = b.path(example.src),
-            .target = target,
-            .optimize = optimize,
+            .root_module = b.createModule(.{
+                .root_source_file = b.path(example.src),
+                .target = target,
+                .optimize = optimize,
+            }),
         });
         exe.root_module.addImport("jwt", jwt);
 
@@ -80,9 +84,11 @@ pub fn build(b: *std.Build) !void {
         example_step.dependOn(&example_build_step.step);
 
         const benchmark_tests = b.addTest(.{
-            .root_source_file = b.path("src/bench.zig"),
-            .target = target,
-            .optimize = optimize,
+            .root_module = b.createModule(.{
+                .root_source_file = b.path("src/bench.zig"),
+                .target = target,
+                .optimize = optimize,
+            }),
             .filters = &.{"bench"},
         });
         const benchmark = b.dependency("benchmark", .{
